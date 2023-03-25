@@ -15,13 +15,13 @@ public class Main {
 
         int[] prices = {57, 39, 189}; //цены продуктов
 
-        File file = new File("basket.txt");
+        File file = new File("basket.bin");
 
-        if (Basket.loadFromTxtFile(file) == null) { //если по данному пути нет файла для загрузки, создаем новую корзину
+        if (Basket.loadFromBinFile(file) == null) { //если по данному пути нет файла для загрузки, создаем новую корзину
             basket = new Basket(products, prices);
 
         } else {
-            basket = Basket.loadFromTxtFile(file); //если она там есть, то сохраняем старую корзину
+            basket = Basket.loadFromBinFile(file); //если она там есть, то сохраняем старую корзину
         }
 
         while (true) {
@@ -45,7 +45,12 @@ public class Main {
                 int productNumber = Integer.parseInt(parts[0]) - 1;
                 int productCount = Integer.parseInt(parts[1]);
 
-                Objects.requireNonNull(basket).addToCart(productNumber, productCount);
+                boolean isAdd = Objects.requireNonNull(basket).addToCart(productNumber, productCount);
+                if (isAdd) {
+                    System.out.println("Товар успешно добавлен в корзину");
+                } else {
+                    System.out.println("Товар не добавлен!");
+                }
 
             } catch (Exception x) {
                 System.out.println("Вы вводите буквы, а необходимы цифры!!!!!!");
@@ -61,7 +66,7 @@ public class Main {
 
         System.out.println(Objects.requireNonNull(basket).printCart()); //выводим корзину на экран
 
-        boolean isSave = Objects.requireNonNull(basket).saveTxt(file); //в конце работы сохраняем нашу корзину
+        boolean isSave = Objects.requireNonNull(basket).saveBin(file, basket); //в конце работы сохраняем нашу корзину
         if (isSave) {
             System.out.println("Файл успешно сохранен");
         } else {

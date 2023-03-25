@@ -1,8 +1,10 @@
 import java.io.*;
 
-public class Basket {
-    private String[] products;
-    private int[] prices;
+public class Basket implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 666L;
+    private final String[] products;
+    private final int[] prices;
     private int[] counts;
 
 
@@ -12,13 +14,40 @@ public class Basket {
         this.counts = new int[products.length];
     }
 
+    public boolean saveBin(File file, Basket basket) {
+        try (FileOutputStream fos = new FileOutputStream(file);
+             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+
+            oos.writeObject(basket);  // запишем экземпляр класса в файл
+            return true;
+
+        } catch (Exception ex) {
+            System.out.println("Ошибка записи файла");
+            return false;
+        }
+    }
+
+    static Basket loadFromBinFile(File file) {
+        try (FileInputStream fis = new FileInputStream(file);
+             ObjectInputStream ois = new ObjectInputStream(fis)) {
+
+            System.out.println("Файл успешно загружен");
+            return (Basket) ois.readObject(); //десериализуем файл в объект
+
+        } catch (Exception ex) {
+            System.out.println("Ошибка чтения файла");
+            return null;
+        }
+    }
+
     public Basket(String[] products, int[] prices, int[] counts) {
         this(products, prices);
         this.counts = counts;
     }
 
-    public void addToCart(int productNum, int productCount) {
+    public boolean addToCart(int productNum, int productCount) {
         this.counts[productNum] += productCount;
+        return true;
     }
 
     public String printCart() {
@@ -79,6 +108,7 @@ public class Basket {
                 loadedCount[i] = Integer.parseInt(countsFromLine[i]);
             }
 
+            System.out.println("Файл успешно загружен");
             return new Basket(loadedProducts, loadedPrices, loadedCount);
 
         } catch (IOException e) {
